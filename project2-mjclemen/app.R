@@ -16,12 +16,15 @@ wards <- readOGR('https://services1.arcgis.com/YZCmUqbcsUpOKfj7/arcgis/rest/serv
 get.water.features <- GET("https://data.wprdc.org/api/3/action/datastore_search_sql?sql=SELECT%20*%0AFROM%20%22513290a6-2bac-4e41-8029-354cbda6a7b7%22")
 water.features <- fromJSON(content(get.water.features, "text"))$result$records
 
+# Clean the data --------------------------------------------------------------------------
+# Convert all column titles to title case, remove "_", and fill in blank cells ------------
 names(water.features) <- str_to_title(names(water.features))
-
-# Rename column names that have "_" separating words --------------------------------------
 names(water.features) <- gsub(x = names(water.features), pattern = "_", replacement = " ")
-
 water.features$Make[water.features$Make == ""] <- "Unknown"
+water.features$`Control type`[water.features$`Control type` == ""] <- "N/A"
+water.features$Inactive[water.features$Inactive == "f"] <- "F"
+water.features$Inactive[water.features$Inactive == ""] <- "T"
+
 
 # Place application title in header of dashboard ------------------------------------------
 app.header <- dashboardHeader(
@@ -46,7 +49,7 @@ app.sidebar <- dashboardSidebar(
               # Select the makes of the water features to view -----------------------------
               checkboxGroupInput(inputId = "selected.make",
                                  label = "Select which make(s) you would like to view:",
-                                 choices = sort(unique(water.features$make)),
+                                 choices = sort(unique(water.features$Make)),
                                  selected = c("Regular Fountain", "Murdock")),
               
               # Select what wards to view -----------------------------------------------------
