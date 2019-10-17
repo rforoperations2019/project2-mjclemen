@@ -98,7 +98,8 @@ app.body <- dashboardBody(
     ),
     tabItem(tabName = "plot1",
             fluidRow(
-              column(12
+              column(12,
+                     plotOutput(outputId = "barplot.neighborhoods")
               )
             )
     ),
@@ -166,6 +167,18 @@ server <- function(input, output) {
       clearGroup(group = "councilDistricts") %>%
       addPolygons(popup = ~paste0("<b>", COUNCIL, "</b>"), group = "councilDistricts", color = "green")
       #setView(lat = council$INTPTLAT10[1], lng = council$INTPTLON10[1], zoom = 12)
+  })
+  
+  
+  output$barplot.neighborhoods <- renderPlot({
+    ws <- waterSubset()
+    req(nrow(ws) > 2)
+    # Find the 10 nationalities with the most deaths to plot on barplot --------
+    top.neighborhoods <- names(tail(sort(table(ws$Neighborhood)),10))
+    ggplot(ws, aes(x = Neighborhood)) + geom_bar(color = "black") +
+      scale_x_discrete(limits = top.neighborhoods) + scale_fill_brewer(palette = "Accent") +
+      labs(x = "Neighborhood of Water Feature", y = "Number of Water Features",
+           title = "Number of Water Features per Neighborhood")
   })
   
 }
