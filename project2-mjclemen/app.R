@@ -99,7 +99,7 @@ app.body <- dashboardBody(
     tabItem(tabName = "plot1",
             fluidRow(
               column(12,
-                     plotOutput(outputId = "barplot.neighborhoods")
+                     plotlyOutput(outputId = "barplot.neighborhoods")
               )
             )
     ),
@@ -170,7 +170,7 @@ server <- function(input, output) {
   })
   
   
-  output$barplot.neighborhoods <- renderPlot({
+  output$barplot.neighborhoods <- renderPlotly({
     ws <- waterSubset()
     req(nrow(ws) > 2)
     # Find the 10 nationalities with the most deaths to plot on barplot --------
