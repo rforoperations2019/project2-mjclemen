@@ -122,6 +122,12 @@ server <- function(input, output) {
     )
   })
   
+  councilUpdate <- reactive({
+    # Build API Query with proper encodes
+    newUrl <- paste0("https://services1.arcgis.com/YZCmUqbcsUpOKfj7/ArcGIS/rest/services/Council_Districts/FeatureServer/0/query?where=Council+%3D+%27", input$selected.council, "%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=")
+    council <- readOGR(newUrl)
+  })
+  
   # Display a data table that shows all of the journalist deaths from 1992 to 2019
   output$watertable <- renderDataTable({
     datatable(data = waterSubset(), options = list(orderClasses = TRUE, autoWidth = FALSE, scrollX = TRUE,
