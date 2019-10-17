@@ -24,10 +24,13 @@ water.features <- fromJSON(content(get.water.features, "text"))$result$records
 # Convert all column titles to title case, remove "_", and fill in blank cells ------------
 names(water.features) <- str_to_title(names(water.features))
 names(water.features) <- gsub(x = names(water.features), pattern = "_", replacement = " ")
-water.features$Make[water.features$Make == ""] <- "Unknown"
-water.features$`Control type`[water.features$`Control type` == ""] <- "N/A"
-water.features$Inactive[water.features$Inactive == "f"] <- "F"
-water.features$Inactive[water.features$Inactive == ""] <- "T"
+water.features$Make[is.na(water.features$Make)] <- "Unknown"
+water.features$`Control type`[is.na(water.features$`Control type`)] <- "N/A"
+water.features$Inactive[is.na(water.features$Inactive)] <- "True"
+water.features$Make <- as.factor(water.features$Make)
+water.features$`Control type` <- as.factor(water.features$`Control type`)
+water.features$Inactive <- as.factor(water.features$Inactive)
+levels(water.features$Inactive)[levels(water.features$Inactive) == "FALSE"] <- "False"
 
 icons <- awesomeIconList(
   Decorative = makeAwesomeIcon(icon = "water", library = "glyphicon", markerColor = "white", iconColor = "blue"),
@@ -175,7 +178,7 @@ server <- function(input, output) {
     req(nrow(ws) > 2)
     # Find the 10 nationalities with the most deaths to plot on barplot --------
     top.neighborhoods <- names(tail(sort(table(ws$Neighborhood)),10))
-    ggplot(ws, aes(x = Neighborhood, fill = "blue")) + geom_bar(color = "black") +
+    ggplot(ws, aes(x = Neighborhood, fill = Inactive)) + geom_bar(color = "black") +
       scale_x_discrete(limits = top.neighborhoods) + scale_fill_brewer(palette = "Accent") +
       labs(x = "Neighborhood of Water Feature", y = "Number of Water Features",
            title = "Number of Water Features per Neighborhood")
