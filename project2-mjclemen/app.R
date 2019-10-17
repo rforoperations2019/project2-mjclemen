@@ -35,7 +35,7 @@ levels(water.features$Inactive)[levels(water.features$Inactive) == "FALSE"] <- "
 
 icons <- awesomeIconList(
   Decorative = makeAwesomeIcon(icon = "water", library = "glyphicon", markerColor = "white", iconColor = "blue"),
-  `Drinking Fountain` = makeAwesomeIcon(icon = "local_drink", library = "glyphicon"),
+  `Drinking Fountain` = makeAwesomeIcon(icon = icon("fas fa-table"), markerColor = "white", iconColor = "blue"),
   Spray = makeAwesomeIcon(icon = "droplet", library = "glyphicon", markerColor = "blue", iconColor = "black")
 )
 
@@ -54,10 +54,10 @@ app.sidebar <- dashboardSidebar(
   # Also place user input controls below the tab options ----------------------------------
   sidebarMenu(id = "tabs",
               
-              menuItem("Water Features Info", tabName = "datatable", icon = icon("fas fa-table")),
               menuItem("Map of Water Features", tabName = "water_map", icon = icon("fas fa-map-marked-alt")),
-              menuItem("Neighborhood", tabName = "neighborhood_count", icon = icon("fas fa-id-card")),
-              menuItem("Control Type by Ward", tabName = "controls_by_ward", icon = icon("fas fa-dizzy")),
+              menuItem("Water Features Info", tabName = "datatable", icon = icon("fas fa-table")),
+              menuItem("Neighborhood", tabName = "neighborhood_count", icon = icon("fas fa-city")),
+              menuItem("Control Type by Ward", tabName = "controls_by_ward", icon = icon("fas fa-gamepad")),
 
               # Select the makes of the water features to view -----------------------------
               checkboxGroupInput(inputId = "selected.make",
@@ -75,7 +75,7 @@ app.sidebar <- dashboardSidebar(
               radioButtons(inputId = "selected.feature.type",
                           label = "Select which Feature Type(s) you would like to view:",
                           choices = sort(unique(water.features$`Feature type`)),
-                          selected = c("Spray")),
+                          selected = c("Drinking Fountain")),
               
               downloadButton("downloadWaterFeatures", "Download Raw Data of Water Features")
   )
@@ -139,10 +139,17 @@ server <- function(input, output) {
       filter(`Feature type` == input$selected.feature.type)
   })
   
+  # Perform API call, based on user's selected council district
   councilUpdate <- reactive({
     # Build API Query with proper encodes
-    newUrl <- paste0("https://services1.arcgis.com/YZCmUqbcsUpOKfj7/ArcGIS/rest/services/Council_Districts/FeatureServer/0/query?where=Council+%3D+%27", input$selected.council, "%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=")
-    council <- readOGR(newUrl)
+    newUrl <- paste0("https://services1.arcgis.com/YZCmUqbcsUpOKfj7/ArcGIS/rest/services/Council_Districts/FeatureServer/0/query?where=Council%20=%20", input$selected.council, "&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=")
+    
+    # change projection
+    council <- readOGR(newUrl) 
+    council <- council %>%
+      spTransform(CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'))
+
+    return(council)
   })
   
   # Display a data table that shows all of the journalist deaths from 1992 to 2019
@@ -168,10 +175,10 @@ server <- function(input, output) {
   
   # Update the polygon layer, showing the selected council district. Remove old polygons
   observe({
-    council <- councilUpdate()
-    leafletProxy("water.leaflet", data = council) %>%
+    print('me too')
+    leafletProxy("water.leaflet", data = councilUpdate()) %>%
       clearGroup(group = "councilDistricts") %>%
-      addPolygons(popup = ~paste0("<b>", COUNCIL, "</b>"), group = "councilDistricts", color = "green")
+      addPolygons(popup = ~paste0("<b>", COUNCIL, "</b>"), group = "councilDistricts", color = "blue")
       #setView(lat = council$INTPTLAT10[1], lng = council$INTPTLON10[1], zoom = 12)
   })
   
@@ -192,7 +199,8 @@ server <- function(input, output) {
     # Read in the reactive subset ------------------------------------------------
     ws <- waterSubset()
     req(nrow(ws) > 3)
-    
+    cat(length(ws$Ward))
+    cat(length(ws$`Control Type`))
     ggplot(ws, aes(x = ws$Ward, y = ws$`Control Type`)) +
       geom_dotplot(binaxis='y',
                    stackdir='center',
