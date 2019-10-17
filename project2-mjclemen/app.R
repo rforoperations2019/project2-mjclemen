@@ -52,8 +52,8 @@ app.sidebar <- dashboardSidebar(
               
               menuItem("Water Features Info", tabName = "datatable", icon = icon("fas fa-table")),
               menuItem("Map of Water Features", tabName = "water_map", icon = icon("fas fa-map-marked-alt")),
-              menuItem("Neighborhood", tabName = "plot1", icon = icon("fas fa-id-card")),
-              menuItem("Plot 2", tabName = "plot2", icon = icon("fas fa-dizzy")),
+              menuItem("Neighborhood", tabName = "neighborhood_count", icon = icon("fas fa-id-card")),
+              menuItem("Plot 2", tabName = "controls_by_ward", icon = icon("fas fa-dizzy")),
 
               # Select the makes of the water features to view -----------------------------
               checkboxGroupInput(inputId = "selected.make",
@@ -96,16 +96,17 @@ app.body <- dashboardBody(
                      )
             )
     ),
-    tabItem(tabName = "plot1",
+    tabItem(tabName = "neighborhood_count",
             fluidRow(
               column(12,
                      plotlyOutput(outputId = "barplot.neighborhoods")
               )
             )
     ),
-    tabItem(tabName = "plot2",
+    tabItem(tabName = "controls_by_ward",
             fluidRow(
-              column(12
+              column(12,
+                     plotlyOutput(outputId = "control.types.per.ward")
               )
             )
     )
@@ -127,10 +128,9 @@ server <- function(input, output) {
   # district, and features of the water dataset ------------------------------------------
   waterSubset <- reactive({
     water.features <- subset(water.features,
-                     Make %in% input$selected.make &
-                       `Council district` %in% input$selected.council &
-                       `Feature type` %in% input$selected.feature.type
-    )
+                     Make %in% input$selected.make) %>%
+      filter(`Council district` == input$selected.council) %>%
+      filter(`Feature type` == input$selected.feature.type)
   })
   
   councilUpdate <- reactive({
@@ -175,10 +175,25 @@ server <- function(input, output) {
     req(nrow(ws) > 2)
     # Find the 10 nationalities with the most deaths to plot on barplot --------
     top.neighborhoods <- names(tail(sort(table(ws$Neighborhood)),10))
-    ggplot(ws, aes(x = Neighborhood)) + geom_bar(color = "black") +
+    ggplot(ws, aes(x = Neighborhood, fill = "blue")) + geom_bar(color = "black") +
       scale_x_discrete(limits = top.neighborhoods) + scale_fill_brewer(palette = "Accent") +
       labs(x = "Neighborhood of Water Feature", y = "Number of Water Features",
            title = "Number of Water Features per Neighborhood")
+  })
+  
+  # Plot the types of user controls throughout the wards in Pittsburgh -----------
+  output$control.types.per.ward <- renderPlotly({
+    # Read in the reactive subset ------------------------------------------------
+    ws <- waterSubset()
+    req(nrow(ws) > 3)
+    
+    ggplot(ws, aes(x = ws$Ward, y = ws$`Control Type`)) +
+      geom_dotplot(binaxis='y',
+                   stackdir='center',
+                   dotsize = .5,
+                   fill="blue") + 
+      labs(x = "Ward of Water Features", y = "User Controls on Water Feature",
+           title = "Frequency of User Control Types in wards Throughout Pittsburgh")
   })
   
 }
