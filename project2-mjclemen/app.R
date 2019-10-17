@@ -159,6 +159,15 @@ server <- function(input, output) {
       addAwesomeMarkers(icon = ~icons[`Feature type`], popup = ~paste0("<b>", Id, "</b>: ", `Feature type`), group = "featureTypes")
   })
   
+  # Update the polygon layer, showing the selected council district. Remove old polygons
+  observe({
+    council <- councilUpdate()
+    leafletProxy("water.leaflet", data = council) %>%
+      clearGroup(group = "councilDistricts") %>%
+      addPolygons(popup = ~paste0("<b>", COUNCIL, "</b>"), group = "councilDistricts", color = "green")
+      #setView(lat = council$INTPTLAT10[1], lng = council$INTPTLON10[1], zoom = 12)
+  })
+  
 }
 
 # Run the application 
