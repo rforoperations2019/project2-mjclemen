@@ -29,12 +29,13 @@ water.features$`Control type`[is.na(water.features$`Control type`)] <- "N/A"
 water.features$Inactive[is.na(water.features$Inactive)] <- "True"
 water.features$Make <- as.factor(water.features$Make)
 water.features$`Control type` <- as.factor(water.features$`Control type`)
+water.features$Ward <- as.factor(water.features$Ward)
 water.features$Inactive <- as.factor(water.features$Inactive)
 levels(water.features$Inactive)[levels(water.features$Inactive) == "FALSE"] <- "False"
 
 icons <- awesomeIconList(
   Decorative = makeAwesomeIcon(icon = "water", library = "glyphicon", markerColor = "white", iconColor = "blue"),
-  `Drinking Fountain` = makeAwesomeIcon(icon = "local_drink", library = "glyphicon", markerColor = "white", iconColor = "black"),
+  `Drinking Fountain` = makeAwesomeIcon(icon = "local_drink", library = "glyphicon"),
   Spray = makeAwesomeIcon(icon = "droplet", library = "glyphicon", markerColor = "blue", iconColor = "black")
 )
 
@@ -56,7 +57,7 @@ app.sidebar <- dashboardSidebar(
               menuItem("Water Features Info", tabName = "datatable", icon = icon("fas fa-table")),
               menuItem("Map of Water Features", tabName = "water_map", icon = icon("fas fa-map-marked-alt")),
               menuItem("Neighborhood", tabName = "neighborhood_count", icon = icon("fas fa-id-card")),
-              menuItem("Plot 2", tabName = "controls_by_ward", icon = icon("fas fa-dizzy")),
+              menuItem("Control Type by Ward", tabName = "controls_by_ward", icon = icon("fas fa-dizzy")),
 
               # Select the makes of the water features to view -----------------------------
               checkboxGroupInput(inputId = "selected.make",
@@ -74,7 +75,9 @@ app.sidebar <- dashboardSidebar(
               radioButtons(inputId = "selected.feature.type",
                           label = "Select which Feature Type(s) you would like to view:",
                           choices = sort(unique(water.features$`Feature type`)),
-                          selected = c("Spray"))
+                          selected = c("Spray")),
+              
+              downloadButton("downloadWaterFeatures", "Download Raw Data of Water Features")
   )
 )
 
@@ -198,6 +201,18 @@ server <- function(input, output) {
       labs(x = "Ward of Water Features", y = "User Controls on Water Feature",
            title = "Frequency of User Control Types in wards Throughout Pittsburgh")
   })
+  
+  # Downloadable csv of water features data filtered by make, council district, and feature type.
+  # Note -- filename and file type (csv) work in web browser, not RStudio. RStudio glitch from what I have read about it
+  output$downloadWaterFeatures <- downloadHandler(
+    filename = function() {
+      paste("Water Features Throughout Pittsburgh with Your Filters",
+            ".csv", sep = "")
+    },
+    content = function(file) {
+      write.csv(waterSubset(), file, row.names = FALSE)
+    }
+  )
   
 }
 
