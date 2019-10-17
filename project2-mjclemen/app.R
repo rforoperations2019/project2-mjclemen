@@ -10,6 +10,10 @@ library(tools)
 library(rlist)
 library(scales)
 library(data.table)
+library(rgdal)
+library(httr)
+library(jsonlite)
+library(leaflet.extras)
 
 council <- readOGR('https://services1.arcgis.com/YZCmUqbcsUpOKfj7/ArcGIS/rest/services/Council_Districts/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=')
 
@@ -25,6 +29,11 @@ water.features$`Control type`[water.features$`Control type` == ""] <- "N/A"
 water.features$Inactive[water.features$Inactive == "f"] <- "F"
 water.features$Inactive[water.features$Inactive == ""] <- "T"
 
+icons <- awesomeIconList(
+  Decorative = makeAwesomeIcon(icon = "water", library = "glyphicon", markerColor = "white", iconColor = "blue"),
+  `Drinking Fountain` = makeAwesomeIcon(icon = "local_drink", library = "glyphicon", markerColor = "white", iconColor = "black"),
+  Spray = makeAwesomeIcon(icon = "droplet", library = "glyphicon", markerColor = "blue", iconColor = "black")
+)
 
 # Place application title in header of dashboard ------------------------------------------
 app.header <- dashboardHeader(
@@ -139,7 +148,15 @@ server <- function(input, output) {
   # Basic Map
   output$water.leaflet <- renderLeaflet({
     leaflet() %>%
-      addProviderTiles(provider = providers$Esri.WorldStreetMap)
+      addProviderTiles(provider = providers$Esri.WorldStreetMap) %>%
+      setView(-79.978, 40.449, 12)
+  })
+  
+  # Add the user's selected water feature to view on the map. Remove old markers
+  observe({
+    leafletProxy("water.leaflet", data = waterSubset()) %>%
+      clearGroup(group = "featureTypes") %>%
+      addAwesomeMarkers(icon = ~icons[`Feature type`], popup = ~paste0("<b>", Id, "</b>: ", `Feature type`), group = "featureTypes")
   })
   
 }
