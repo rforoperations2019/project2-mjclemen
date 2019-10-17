@@ -149,7 +149,7 @@ server <- function(input, output) {
   output$water.leaflet <- renderLeaflet({
     leaflet() %>%
       addProviderTiles(provider = providers$Esri.WorldStreetMap) %>%
-      setView(-79.978, 40.449, 12)
+      setView(-79.978, 40.439, 12)
   })
   
   # Add the user's selected water feature to view on the map. Remove old markers
