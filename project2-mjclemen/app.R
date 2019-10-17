@@ -16,7 +16,7 @@ wards <- readOGR('https://services1.arcgis.com/YZCmUqbcsUpOKfj7/arcgis/rest/serv
 get.water.features <- GET("https://data.wprdc.org/api/3/action/datastore_search_sql?sql=SELECT%20*%0AFROM%20%22513290a6-2bac-4e41-8029-354cbda6a7b7%22")
 water.features <- fromJSON(content(get.water.features, "text"))$result$records
 
-names(water.features) <- toTitleCase(names(water.features))
+names(water.features) <- str_to_title(names(water.features))
 
 # Rename column names that have "_" separating words --------------------------------------
 names(water.features) <- gsub(x = names(water.features), pattern = "_", replacement = " ")
@@ -39,10 +39,10 @@ app.sidebar <- dashboardSidebar(
   sidebarMenu(id = "tabs",
               
               menuItem("Water Features Info", tabName = "datatable", icon = icon("fas fa-table")),
-              menuItem("Map of Water Features", tabName = "water_map", icon = icon("fas fa-globe-americas")),
-              menuItem("Plot 1", tabName = "plot1", icon = icon("fas fa-id-card")),
+              menuItem("Map of Water Features", tabName = "water_map", icon = icon("fas fa-map-marked-alt")),
+              menuItem("Neighborhood", tabName = "plot1", icon = icon("fas fa-id-card")),
               menuItem("Plot 2", tabName = "plot2", icon = icon("fas fa-dizzy")),
-              
+
               # Select the makes of the water features to view -----------------------------
               checkboxGroupInput(inputId = "selected.make",
                                  label = "Select which make(s) you would like to view:",
@@ -50,13 +50,14 @@ app.sidebar <- dashboardSidebar(
                                  selected = c("Regular Fountain", "Murdock")),
               
               # Select what wards to view -----------------------------------------------------
-              radioButtons(inputId = "selected.medium",
+              radioButtons(inputId = "selected.ward",
                            label = "Select which ward you would like to view:",
                            choices = sort(unique(water.features$ward)),
                            selected = "5"),
               
+              # Select what feature types to view -----------------------------------------------------
               selectInput(inputId = "selected.feature.type",
-                          label = "Select which feature type(s) to view:",
+                          label = "Select which feature type(s) you would like to view:",
                           choices = sort(unique(water.features$feature_type)),
                           selected = c("Spray", "Drinking Fountain"))
   )
