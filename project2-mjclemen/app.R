@@ -82,7 +82,8 @@ app.body <- dashboardBody(
     ),
     tabItem(tabName = "water_map",
             fluidRow(
-              column(12
+              column(12,
+                     leafletOutput("water.leaflet")
                      )
             )
     ),
@@ -133,6 +134,12 @@ server <- function(input, output) {
     datatable(data = waterSubset(), options = list(orderClasses = TRUE, autoWidth = FALSE, scrollX = TRUE,
                                                     pageLength = 5),
               class = 'cell-border stripe', rownames = FALSE)
+  })
+  
+  # Basic Map
+  output$water.leaflet <- renderLeaflet({
+    leaflet() %>%
+      addProviderTiles(provider = providers$Esri.WorldStreetMap)
   })
   
 }
