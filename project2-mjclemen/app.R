@@ -11,7 +11,7 @@ library(rlist)
 library(scales)
 library(data.table)
 
-wards <- readOGR('https://services1.arcgis.com/YZCmUqbcsUpOKfj7/arcgis/rest/services/PGHWards/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=')
+council <- readOGR('https://services1.arcgis.com/YZCmUqbcsUpOKfj7/ArcGIS/rest/services/Council_Districts/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=')
 
 get.water.features <- GET("https://data.wprdc.org/api/3/action/datastore_search_sql?sql=SELECT%20*%0AFROM%20%22513290a6-2bac-4e41-8029-354cbda6a7b7%22")
 water.features <- fromJSON(content(get.water.features, "text"))$result$records
@@ -48,21 +48,21 @@ app.sidebar <- dashboardSidebar(
 
               # Select the makes of the water features to view -----------------------------
               checkboxGroupInput(inputId = "selected.make",
-                                 label = "Select which make(s) you would like to view:",
+                                 label = "Select which Make(s) you would like to view:",
                                  choices = sort(unique(water.features$Make)),
                                  selected = c("Regular Fountain", "Murdock")),
               
-              # Select what wards to view -----------------------------------------------------
-              radioButtons(inputId = "selected.ward",
-                           label = "Select which ward you would like to view:",
-                           choices = sort(unique(water.features$ward)),
+              # Select what council district to view ---------------------------------------------------
+              selectInput(inputId = "selected.council",
+                           label = "Select which Council District you would like to view:",
+                           choices = sort(unique(water.features$`Council district`)),
                            selected = "5"),
               
-              # Select what feature types to view -----------------------------------------------------
-              selectInput(inputId = "selected.feature.type",
-                          label = "Select which feature type(s) you would like to view:",
-                          choices = sort(unique(water.features$feature_type)),
-                          selected = c("Spray", "Drinking Fountain"))
+              # Select what feature types to view -------------------------------------------
+              radioButtons(inputId = "selected.feature.type",
+                          label = "Select which Feature Type(s) you would like to view:",
+                          choices = sort(unique(water.features$`Feature type`)),
+                          selected = c("Spray"))
   )
 )
 
@@ -74,7 +74,7 @@ app.body <- dashboardBody(
   tabItems(
     tabItem(tabName = "datatable",
             fluidRow(
-              # Show data table filtered based on user input -------------------------
+              # Show data table filtered based on user input --------------------------------
               box(title = "Selected Water Features Data",
                   dataTableOutput(outputId = "watertable"),
                   width = 12)
@@ -112,9 +112,19 @@ ui <- dashboardPage(
 # Define server logic required to draw charts, datatables, and numeric based boxes
 server <- function(input, output) {
   
+  # Create subset of water features to account for user input. Specifically, make, council
+  # district, and features of the water dataset ------------------------------------------
+  waterSubset <- reactive({
+    water.features <- subset(water.features,
+                     Make %in% input$selected.make &
+                       `Council district` %in% input$selected.council &
+                       `Feature type` %in% input$selected.feature.type
+    )
+  })
+  
   # Display a data table that shows all of the journalist deaths from 1992 to 2019
   output$watertable <- renderDataTable({
-    datatable(data = water.features, options = list(orderClasses = TRUE, autoWidth = FALSE, scrollX = TRUE,
+    datatable(data = waterSubset(), options = list(orderClasses = TRUE, autoWidth = FALSE, scrollX = TRUE,
                                                     pageLength = 5),
               class = 'cell-border stripe', rownames = FALSE)
   })
