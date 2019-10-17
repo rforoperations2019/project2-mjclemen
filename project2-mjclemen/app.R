@@ -33,6 +33,8 @@ water.features$Ward <- as.factor(water.features$Ward)
 water.features$Inactive <- as.factor(water.features$Inactive)
 levels(water.features$Inactive)[levels(water.features$Inactive) == "FALSE"] <- "False"
 
+# Make icons to appear as markers on leaflet map. Will show different images based on user's
+# selected water feature type
 icons <- awesomeIconList(
   Decorative = makeAwesomeIcon(icon = "water", library = "glyphicon", markerColor = "white", iconColor = "blue"),
   `Drinking Fountain` = makeAwesomeIcon(icon = 'glass-whiskey', library = 'fa', markerColor = 'white', iconColor = "black"),
@@ -61,7 +63,7 @@ app.sidebar <- dashboardSidebar(
 
               # Select the makes of the water features to view -----------------------------
               checkboxGroupInput(inputId = "selected.make",
-                                 label = "Select which Make(s) you would like to view:",
+                                 label = "Select which Make(s) of Water Features you would like to view:",
                                  choices = sort(unique(water.features$Make)),
                                  selected = c("Regular Fountain", "Murdock")),
               
@@ -73,7 +75,7 @@ app.sidebar <- dashboardSidebar(
               
               # Select what feature types to view -------------------------------------------
               radioButtons(inputId = "selected.feature.type",
-                          label = "Select which Feature Type(s) you would like to view:",
+                          label = "Select which Water Feature Type(s) you would like to view:",
                           choices = sort(unique(water.features$`Feature Type`)),
                           selected = c("Drinking Fountain")),
               
@@ -178,14 +180,14 @@ server <- function(input, output) {
     print('me too')
     leafletProxy("water.leaflet", data = councilUpdate()) %>%
       clearGroup(group = "councilDistricts") %>%
-      addPolygons(popup = ~paste0("<b>", COUNCIL, "</b>"), group = "councilDistricts", color = "blue")
+      addPolygons(popup = ~paste0("<b>", COUNCIL, "</b>"), group = "councilDistricts", color = "black")
       #setView(lat = council$INTPTLAT10[1], lng = council$INTPTLON10[1], zoom = 12)
   })
   
-  
+  # Plot the number of water features in given neighborhoods
   output$barplot.neighborhoods <- renderPlotly({
     ws <- waterSubset()
-    req(nrow(ws) > 2)
+    req(nrow(ws) > 0)
     # Find the 10 nationalities with the most deaths to plot on barplot --------
     top.neighborhoods <- names(tail(sort(table(ws$Neighborhood)),10))
     ggplot(ws, aes(x = Neighborhood, fill = Inactive)) + geom_bar(color = "black") +
@@ -198,12 +200,9 @@ server <- function(input, output) {
   output$control.types.per.ward <- renderPlotly({
     # Read in the reactive subset ------------------------------------------------
     ws <- waterSubset()
-    req(nrow(ws) > 3)
-    ggplot(ws, aes(x = ws$Ward, y = ws$`Control Type`)) +
-      geom_dotplot(binaxis='y',
-                   stackdir='center',
-                   dotsize = .5,
-                   fill= "blue") + 
+    req(nrow(ws) > 0)
+    ggplot(ws, aes(x = Ward, y = `Control Type`)) +
+      geom_point(col="tomato2", size = 3, position = "jitter", alpha = 0.5) + 
       labs(x = "Ward of Water Features", y = "User Controls on Water Feature",
            title = "Frequency of User Control Types in wards Throughout Pittsburgh")
   })
