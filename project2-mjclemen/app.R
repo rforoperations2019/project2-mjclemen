@@ -22,21 +22,21 @@ water.features <- fromJSON(content(get.water.features, "text"))$result$records
 
 # Clean the data --------------------------------------------------------------------------
 # Convert all column titles to title case, remove "_", and fill in blank cells ------------
-names(water.features) <- str_to_title(names(water.features))
 names(water.features) <- gsub(x = names(water.features), pattern = "_", replacement = " ")
+names(water.features) <- str_to_title(names(water.features))
 water.features$Make[is.na(water.features$Make)] <- "Unknown"
-water.features$`Control type`[is.na(water.features$`Control type`)] <- "N/A"
+water.features$`Control Type`[is.na(water.features$`Control Type`)] <- "N/A"
 water.features$Inactive[is.na(water.features$Inactive)] <- "True"
 water.features$Make <- as.factor(water.features$Make)
-water.features$`Control type` <- as.factor(water.features$`Control type`)
+water.features$`Control Type` <- as.factor(water.features$`Control Type`)
 water.features$Ward <- as.factor(water.features$Ward)
 water.features$Inactive <- as.factor(water.features$Inactive)
 levels(water.features$Inactive)[levels(water.features$Inactive) == "FALSE"] <- "False"
 
 icons <- awesomeIconList(
   Decorative = makeAwesomeIcon(icon = "water", library = "glyphicon", markerColor = "white", iconColor = "blue"),
-  `Drinking Fountain` = makeAwesomeIcon(icon = icon("fas fa-table"), markerColor = "white", iconColor = "blue"),
-  Spray = makeAwesomeIcon(icon = "droplet", library = "glyphicon", markerColor = "blue", iconColor = "black")
+  `Drinking Fountain` = makeAwesomeIcon(icon = 'glass-whiskey', library = 'fa', markerColor = 'white', iconColor = "black"),
+  Spray = makeAwesomeIcon(icon = 'tint', library = 'fa', markerColor = "blue", iconColor = "black")
 )
 
 # Place application title in header of dashboard ------------------------------------------
@@ -68,13 +68,13 @@ app.sidebar <- dashboardSidebar(
               # Select what council district to view ---------------------------------------------------
               selectInput(inputId = "selected.council",
                            label = "Select which Council District you would like to view:",
-                           choices = sort(unique(water.features$`Council district`)),
+                           choices = sort(unique(water.features$`Council District`)),
                            selected = "5"),
               
               # Select what feature types to view -------------------------------------------
               radioButtons(inputId = "selected.feature.type",
                           label = "Select which Feature Type(s) you would like to view:",
-                          choices = sort(unique(water.features$`Feature type`)),
+                          choices = sort(unique(water.features$`Feature Type`)),
                           selected = c("Drinking Fountain")),
               
               downloadButton("downloadWaterFeatures", "Download Raw Data of Water Features")
@@ -135,8 +135,8 @@ server <- function(input, output) {
   waterSubset <- reactive({
     water.features <- subset(water.features,
                      Make %in% input$selected.make) %>%
-      filter(`Council district` == input$selected.council) %>%
-      filter(`Feature type` == input$selected.feature.type)
+      filter(`Council District` == input$selected.council) %>%
+      filter(`Feature Type` == input$selected.feature.type)
   })
   
   # Perform API call, based on user's selected council district
@@ -170,7 +170,7 @@ server <- function(input, output) {
   observe({
     leafletProxy("water.leaflet", data = waterSubset()) %>%
       clearGroup(group = "featureTypes") %>%
-      addAwesomeMarkers(icon = ~icons[`Feature type`], popup = ~paste0("<b>", Id, "</b>: ", `Feature type`), group = "featureTypes")
+      addAwesomeMarkers(icon = ~icons[`Feature Type`], popup = ~paste0("<b>", Id, "</b>: ", `Feature Type`), group = "featureTypes")
   })
   
   # Update the polygon layer, showing the selected council district. Remove old polygons
@@ -199,13 +199,11 @@ server <- function(input, output) {
     # Read in the reactive subset ------------------------------------------------
     ws <- waterSubset()
     req(nrow(ws) > 3)
-    cat(length(ws$Ward))
-    cat(length(ws$`Control Type`))
     ggplot(ws, aes(x = ws$Ward, y = ws$`Control Type`)) +
       geom_dotplot(binaxis='y',
                    stackdir='center',
                    dotsize = .5,
-                   fill="blue") + 
+                   fill= "blue") + 
       labs(x = "Ward of Water Features", y = "User Controls on Water Feature",
            title = "Frequency of User Control Types in wards Throughout Pittsburgh")
   })
