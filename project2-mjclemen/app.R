@@ -114,14 +114,20 @@ app.body <- dashboardBody(
     tabItem(tabName = "neighborhood_count",
             fluidRow(
               column(12,
+                     verbatimTextOutput(outputId = "printMessage"))
+            ),
+            fluidRow(
+              column(12,
                      plotlyOutput(outputId = "barplot.neighborhoods")
               )
             )
     ),
     tabItem(tabName = "controls_by_ward",
             fluidRow(
-              column(12,
-                     verbatimTextOutput(outputId = "printMessage"))
+              column(11,
+                     verbatimTextOutput(outputId = "printMessage2"),
+                     tags$head(tags$style("#printMessage2{color: red; font-size: 20px; font-style: italic;}"))
+                     )
               ),
               fluidRow(
               column(12,
@@ -236,9 +242,13 @@ server <- function(input, output) {
   
   output$printMessage <- renderText({
     req(nrow(waterSubset()) == 0)
-    "There is no data meeting your filter criteria. Please adjust filters"
+    "Unable to plot Neighborhoods: There is no data meeting your filter criteria. Please adjust filters"
   })
   
+  output$printMessage2 <- renderText({
+    req(nrow(waterSubset()) == 0)
+    "Unable to plot Control Types by Ward: There is no data meeting your filter criteria. Please adjust filters"
+  })
 }
 
 # Run the application 
