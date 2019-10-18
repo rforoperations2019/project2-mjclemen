@@ -190,8 +190,8 @@ server <- function(input, output) {
     req(nrow(ws) > 0)
     # Find the 10 nationalities with the most deaths to plot on barplot --------
     top.neighborhoods <- names(tail(sort(table(ws$Neighborhood)),10))
-    ggplot(ws, aes(x = Neighborhood, fill = Inactive)) + geom_bar(color = "black") +
-      scale_x_discrete(limits = top.neighborhoods) + scale_fill_brewer(palette = "Accent") +
+    ggplot(ws, aes(x = Neighborhood, fill = Inactive)) + geom_bar(fill = "blue") +
+      scale_x_discrete(limits = top.neighborhoods) +
       labs(x = "Neighborhood of Water Feature", y = "Number of Water Features",
            title = "Number of Water Features per Neighborhood")
   })
@@ -202,7 +202,7 @@ server <- function(input, output) {
     ws <- waterSubset()
     req(nrow(ws) > 0)
     ggplot(ws, aes(x = Ward, y = `Control Type`)) +
-      geom_point(col="tomato2", size = 3, position = "jitter", alpha = 0.5) + 
+      geom_point(col = "blue", size = 3, position = "jitter", alpha = 0.5) + 
       labs(x = "Ward of Water Features", y = "User Controls on Water Feature",
            title = "Frequency of User Control Types in wards Throughout Pittsburgh")
   })
