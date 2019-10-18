@@ -37,8 +37,8 @@ levels(water.features$Inactive)[levels(water.features$Inactive) == "FALSE"] <- "
 # selected water feature type
 icons <- awesomeIconList(
   Decorative = makeAwesomeIcon(icon = "fire", library = "glyphicon", markerColor = "white", iconColor = "steelblue"),
-  `Drinking Fountain` = makeAwesomeIcon(icon = 'glass-whiskey', library = 'fa', markerColor = 'white', iconColor = "black"),
-  Spray = makeAwesomeIcon(icon = 'tint', library = 'fa', markerColor = "blue", iconColor = "black")
+  `Drinking Fountain` = makeAwesomeIcon(icon = "coffee", library = "fa", markerColor = 'white', iconColor = "steelblue"),
+  Spray = makeAwesomeIcon(icon = 'tint', library = 'fa', markerColor = "white", iconColor = "steelblue")
 )
 
 # Place application title in header of dashboard ------------------------------------------
