@@ -164,7 +164,7 @@ server <- function(input, output) {
   # Basic Map
   output$water.leaflet <- renderLeaflet({
     leaflet() %>%
-      addProviderTiles(provider = providers$Esri.WorldStreetMap) %>%
+      addProviderTiles(provider = providers$Esri.NatGeoWorldMap) %>%
       setView(-79.978, 40.439, 12)
   })
   
@@ -180,7 +180,7 @@ server <- function(input, output) {
     print('me too')
     leafletProxy("water.leaflet", data = councilUpdate()) %>%
       clearGroup(group = "councilDistricts") %>%
-      addPolygons(popup = ~paste0("<b>", COUNCIL, "</b>"), group = "councilDistricts", color = "steelblue")
+      addPolygons(popup = ~paste0("<b>", COUNCIL, "</b>"), group = "councilDistricts", color = "red")
       #setView(lat = council$INTPTLAT10[1], lng = council$INTPTLON10[1], zoom = 12)
   })
   
@@ -190,8 +190,8 @@ server <- function(input, output) {
     req(nrow(ws) > 0)
     # Find the 10 nationalities with the most deaths to plot on barplot --------
     top.neighborhoods <- names(tail(sort(table(ws$Neighborhood)),10))
-    ggplot(ws, aes(x = Neighborhood, fill = Inactive)) + geom_bar(fill = "steelblue") +
-      scale_x_discrete(limits = top.neighborhoods) +
+    ggplot(ws, aes(x = Neighborhood, fill = Inactive)) + geom_bar() +
+      scale_x_discrete(limits = top.neighborhoods) + scale_fill_manual(values = c("False" = "steelblue", "True" = "red")) + 
       labs(x = "Neighborhood of Water Feature", y = "Number of Water Features",
            title = "Number of Water Features per Neighborhood")
   })
@@ -204,7 +204,7 @@ server <- function(input, output) {
     ggplot(ws, aes(x = Ward, y = `Control Type`)) +
       geom_point(col = "steelblue", size = 3, position = "jitter", alpha = 0.7) + 
       labs(x = "Ward of Water Features", y = "User Controls on Water Feature",
-           title = "Frequency of User Control Types in wards Throughout Pittsburgh")
+           title = "Types of Water Feature Controls in Wards Throughout Pittsburgh")
   })
   
   # Downloadable csv of water features data filtered by make, council district, and feature type.
