@@ -128,7 +128,7 @@ app.body <- dashboardBody(
   )
 )
 
-# Define UI for application that creates a dashboard on journalist deaths since 1992
+# Define UI for application that creates a dashboard on water features in Pittsburgh
 ui <- dashboardPage(
   header = app.header,
   sidebar = app.sidebar,
@@ -161,14 +161,14 @@ server <- function(input, output) {
     return(council)
   })
   
-  # Display a data table that shows all of the journalist deaths from 1992 to 2019
+  # Display a data table that shows all of water features in Pittsburgh
   output$watertable <- renderDataTable({
     datatable(data = waterSubset(), options = list(orderClasses = TRUE, autoWidth = FALSE, scrollX = TRUE,
                                                     pageLength = 5),
               class = 'cell-border stripe', rownames = FALSE)
   })
   
-  # Basic Map
+  # Basic Map -- chosen basemap and set the view to show a certain part of pittsburgh
   output$water.leaflet <- renderLeaflet({
     leaflet() %>%
       addProviderTiles(provider = providers$Esri.NatGeoWorldMap) %>%
