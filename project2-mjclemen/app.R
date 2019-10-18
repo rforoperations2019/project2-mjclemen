@@ -197,7 +197,7 @@ server <- function(input, output) {
   output$barplot.neighborhoods <- renderPlotly({
     ws <- waterSubset()
     req(nrow(ws) > 0)
-    # Find the 10 nationalities with the most deaths to plot on barplot --------
+    # Find the 10 neighborhoods with the most water features to plot on barplot --------
     top.neighborhoods <- names(tail(sort(table(ws$Neighborhood)),10))
     ggplot(ws, aes(x = Neighborhood, fill = Status)) + geom_bar() +
       scale_x_discrete(limits = top.neighborhoods) + scale_fill_manual("Status:",
