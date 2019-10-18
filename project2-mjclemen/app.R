@@ -36,7 +36,7 @@ levels(water.features$Inactive)[levels(water.features$Inactive) == "FALSE"] <- "
 # Make icons to appear as markers on leaflet map. Will show different images based on user's
 # selected water feature type
 icons <- awesomeIconList(
-  Decorative = makeAwesomeIcon(icon = "water", library = "glyphicon", markerColor = "white", iconColor = "blue"),
+  Decorative = makeAwesomeIcon(icon = "fire", library = "glyphicon", markerColor = "white", iconColor = "steelblue"),
   `Drinking Fountain` = makeAwesomeIcon(icon = 'glass-whiskey', library = 'fa', markerColor = 'white', iconColor = "black"),
   Spray = makeAwesomeIcon(icon = 'tint', library = 'fa', markerColor = "blue", iconColor = "black")
 )
