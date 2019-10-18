@@ -48,7 +48,7 @@ icons <- awesomeIconList(
 
 # Place application title in header of dashboard ------------------------------------------
 app.header <- dashboardHeader(
-  title = "Water Features Throughout Pittsburgh", titleWidth = 300
+  title = "Pittsburgh Water Features", titleWidth = 300
 )
 
 # Place user inputs and tab options in a sidebar to be displayed in dashboard
@@ -148,7 +148,7 @@ server <- function(input, output) {
       filter(`Feature Type` == input$selected.feature.type)
   })
   
-  # Perform API call, based on user's selected council district
+  # Perform updated API call, based on user's selected council district
   councilUpdate <- reactive({
     # Build API Query with proper encodes
     newUrl <- paste0("https://services1.arcgis.com/YZCmUqbcsUpOKfj7/ArcGIS/rest/services/Council_Districts/FeatureServer/0/query?where=Council%20=%20", input$selected.council, "&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=")
