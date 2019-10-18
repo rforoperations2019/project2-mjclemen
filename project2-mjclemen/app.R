@@ -21,7 +21,8 @@ get.water.features <- GET("https://data.wprdc.org/api/3/action/datastore_search_
 water.features <- fromJSON(content(get.water.features, "text"))$result$records
 
 # Clean the data --------------------------------------------------------------------------
-# Convert all column titles to title case, remove "_", and fill in blank cells ------------
+# Convert column titles to title case, remove "_", fill in blank cells, remove unnecessary
+# columns, and convert some columns to factors to recognize categories --------------------
 names(water.features) <- gsub(x = names(water.features), pattern = "_", replacement = " ")
 names(water.features) <- str_to_title(names(water.features))
 water.features$Make[is.na(water.features$Make)] <- "Unknown"
