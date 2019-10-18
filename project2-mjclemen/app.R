@@ -179,7 +179,9 @@ server <- function(input, output) {
   observe({
     leafletProxy("water.leaflet", data = waterSubset()) %>%
       clearGroup(group = "featureTypes") %>%
-      addAwesomeMarkers(icon = ~icons[`Feature Type`], popup = ~paste0("<b>", Id, "</b>: ", `Feature Type`), group = "featureTypes")
+      addAwesomeMarkers(icon = ~icons[`Feature Type`],
+                        popup = ~paste0("<b>", "Located At", "</b>: ", Name),
+                        group = "featureTypes")
   })
   
   # Update the polygon layer, showing the selected council district. Remove old polygons
