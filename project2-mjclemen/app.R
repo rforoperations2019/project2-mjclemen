@@ -56,10 +56,10 @@ app.sidebar <- dashboardSidebar(
   # Also place user input controls below the tab options ----------------------------------
   sidebarMenu(id = "tabs",
               
-              menuItem("Map of Water Features", tabName = "water_map", icon = icon("fas fa-map-pin")),
-              menuItem("Water Features Info", tabName = "datatable", icon = icon("fas fa-table")),
-              menuItem("Neighborhood", tabName = "neighborhood_count", icon = icon("fas fa-building")),
-              menuItem("Control Type by Ward", tabName = "controls_by_ward", icon = icon("fas fa-gamepad")),
+              menuItem("Map of Water Features", tabName = "water_map", icon = icon("map-marker", lib = "glyphicon")),
+              menuItem("Water Features Info", tabName = "datatable", icon = icon("table", lib = "font-awesome")),
+              menuItem("Neighborhood", tabName = "neighborhood_count", icon = icon("home", lib = "glyphicon")),
+              menuItem("Control Type by Ward", tabName = "controls_by_ward", icon = icon("gamepad", lib= "font-awesome")),
 
               # Select the makes of the water features to view -----------------------------
               checkboxGroupInput(inputId = "selected.make",
