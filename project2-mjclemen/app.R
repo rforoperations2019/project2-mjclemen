@@ -15,8 +15,10 @@ library(httr)
 library(jsonlite)
 library(leaflet.extras)
 
+# FIRST API CALL: Grabbing Pittsburgh's council data to add polygons as a layer on leaflet map
 council <- readOGR('https://services1.arcgis.com/YZCmUqbcsUpOKfj7/ArcGIS/rest/services/Council_Districts/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=')
 
+# SECOND API CALL: Grabbing Pittsburgh's water features data to display to users in a map, datable, and two maps
 get.water.features <- GET("https://data.wprdc.org/api/3/action/datastore_search_sql?sql=SELECT%20*%0AFROM%20%22513290a6-2bac-4e41-8029-354cbda6a7b7%22")
 water.features <- fromJSON(content(get.water.features, "text"))$result$records
 
@@ -55,7 +57,7 @@ app.sidebar <- dashboardSidebar(
   # Change sidebar width to match the title width -----------------------------------------
   width = 300,
   
-  # Create four tab options to place the datatable, the 3 valueboxes, and 3 plots
+  # Create four tab options to place the datatable, map, and 2 plots
   # Also place user input controls below the tab options ----------------------------------
   sidebarMenu(id = "tabs",
               
@@ -64,25 +66,27 @@ app.sidebar <- dashboardSidebar(
               menuItem("Neighborhood", tabName = "neighborhood_count", icon = icon("home", lib = "glyphicon")),
               menuItem("Control Type by Ward", tabName = "controls_by_ward", icon = icon("gamepad", lib= "font-awesome")),
 
-              # Select the makes of the water features to view -----------------------------
+              # Select the Makes of the water features to view -----------------------------
               checkboxGroupInput(inputId = "selected.make",
                                  label = "Select which Make(s) of Water Features you would like to view:",
                                  choices = sort(unique(water.features$Make)),
                                  selected = c("Regular Fountain", "Murdock")),
               
-              # Select what council district to view ---------------------------------------------------
+              # Select what Council District to view ---------------------------------------------------
               selectInput(inputId = "selected.council",
                            label = "Select which Council District you would like to view:",
                            choices = sort(unique(water.features$`Council District`)),
                            selected = "5"),
               
-              # Select what feature types to view -------------------------------------------
+              # Select what Feature Types to view -------------------------------------------
               radioButtons(inputId = "selected.feature.type",
                           label = "Select which Water Feature Type(s) you would like to view:",
                           choices = sort(unique(water.features$`Feature Type`)),
                           selected = c("Drinking Fountain")),
               
-              downloadButton("downloadWaterFeatures", "Download Raw Data of Water Features")
+              downloadButton("downloadWaterFeatures", "Download Filtered 'Water Features' Data", class = "butt"),
+              # Changing color of download button to better show up against background
+              tags$head(tags$style(".butt{color: black !important;}"))
   )
 )
 
