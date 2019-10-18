@@ -26,12 +26,13 @@ names(water.features) <- gsub(x = names(water.features), pattern = "_", replacem
 names(water.features) <- str_to_title(names(water.features))
 water.features$Make[is.na(water.features$Make)] <- "Unknown"
 water.features$`Control Type`[is.na(water.features$`Control Type`)] <- "N/A"
-water.features$Inactive[is.na(water.features$Inactive)] <- "True"
+water.features$Inactive[is.na(water.features$Inactive)] <- "Inactive"
 water.features$Make <- as.factor(water.features$Make)
 water.features$`Control Type` <- as.factor(water.features$`Control Type`)
 water.features$Ward <- as.factor(water.features$Ward)
 water.features$Inactive <- as.factor(water.features$Inactive)
-levels(water.features$Inactive)[levels(water.features$Inactive) == "FALSE"] <- "False"
+levels(water.features$Inactive)[levels(water.features$Inactive) == "FALSE"] <- "Active"
+colnames(water.features)[colnames(water.features) == "Inactive"] <- "Status"
 
 # Make icons to appear as markers on leaflet map. Will show different images based on user's
 # selected water feature type
@@ -190,8 +191,9 @@ server <- function(input, output) {
     req(nrow(ws) > 0)
     # Find the 10 nationalities with the most deaths to plot on barplot --------
     top.neighborhoods <- names(tail(sort(table(ws$Neighborhood)),10))
-    ggplot(ws, aes(x = Neighborhood, fill = Inactive)) + geom_bar() +
-      scale_x_discrete(limits = top.neighborhoods) + scale_fill_manual(values = c("False" = "steelblue", "True" = "red")) + 
+    ggplot(ws, aes(x = Neighborhood, fill = Status)) + geom_bar() +
+      scale_x_discrete(limits = top.neighborhoods) + scale_fill_manual("Status:",
+                                                                       values = c("Active" = "steelblue", "Inactive" = "red")) + 
       labs(x = "Neighborhood of Water Feature", y = "Number of Water Features",
            title = "Number of Water Features per Neighborhood")
   })
