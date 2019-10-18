@@ -180,7 +180,7 @@ server <- function(input, output) {
     print('me too')
     leafletProxy("water.leaflet", data = councilUpdate()) %>%
       clearGroup(group = "councilDistricts") %>%
-      addPolygons(popup = ~paste0("<b>", COUNCIL, "</b>"), group = "councilDistricts", color = "black")
+      addPolygons(popup = ~paste0("<b>", COUNCIL, "</b>"), group = "councilDistricts", color = "steelblue")
       #setView(lat = council$INTPTLAT10[1], lng = council$INTPTLON10[1], zoom = 12)
   })
   
