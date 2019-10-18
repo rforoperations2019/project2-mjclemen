@@ -37,7 +37,7 @@ levels(water.features$Inactive)[levels(water.features$Inactive) == "FALSE"] <- "
 # selected water feature type
 icons <- awesomeIconList(
   Decorative = makeAwesomeIcon(icon = "water", library = "glyphicon", markerColor = "white", iconColor = "blue"),
-  `Drinking Fountain` = makeAwesomeIcon(icon = 'glass-whiskey', library = 'fas', markerColor = 'white', iconColor = "black"),
+  `Drinking Fountain` = makeAwesomeIcon(icon = 'fa glass-whiskey', library = 'fa', markerColor = 'white', iconColor = "black"),
   Spray = makeAwesomeIcon(icon = 'tint', library = 'fa', markerColor = "blue", iconColor = "black")
 )
 
