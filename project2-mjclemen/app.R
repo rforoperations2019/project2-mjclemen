@@ -202,7 +202,7 @@ server <- function(input, output) {
     ws <- waterSubset()
     req(nrow(ws) > 0)
     ggplot(ws, aes(x = Ward, y = `Control Type`)) +
-      geom_point(col = "steelblue", size = 3, position = "jitter", alpha = 0.5) + 
+      geom_point(col = "steelblue", size = 3, position = "jitter", alpha = 0.8) + 
       labs(x = "Ward of Water Features", y = "User Controls on Water Feature",
            title = "Frequency of User Control Types in wards Throughout Pittsburgh")
   })
