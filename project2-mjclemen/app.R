@@ -33,6 +33,7 @@ water.features$Ward <- as.factor(water.features$Ward)
 water.features$Inactive <- as.factor(water.features$Inactive)
 levels(water.features$Inactive)[levels(water.features$Inactive) == "FALSE"] <- "Active"
 colnames(water.features)[colnames(water.features) == "Inactive"] <- "Status"
+water.features <- select(water.features, -c(" Full Text", " Id"))
 
 # Make icons to appear as markers on leaflet map. Will show different images based on user's
 # selected water feature type
