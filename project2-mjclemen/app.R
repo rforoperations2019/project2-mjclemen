@@ -121,7 +121,7 @@ app.body <- dashboardBody(
     tabItem(tabName = "controls_by_ward",
             fluidRow(
               column(12,
-                     plotlyOutput(outputId = "control.types.per.ward")
+                     plotlyOutput(outputId = "control.types.per.ward"), verbatimTextOutput(outputId = "printMessage")
               )
             )
     )
@@ -229,6 +229,11 @@ server <- function(input, output) {
       write.csv(waterSubset(), file, row.names = FALSE)
     }
   )
+  
+  output$printMessage <- renderText({
+    req(nrow(waterSubset()) == 0)
+    "There is no data meeting your filter criteria. Please adjust filters"
+  })
   
 }
 
