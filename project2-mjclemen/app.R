@@ -121,9 +121,13 @@ app.body <- dashboardBody(
     tabItem(tabName = "controls_by_ward",
             fluidRow(
               column(12,
-                     plotlyOutput(outputId = "control.types.per.ward"), verbatimTextOutput(outputId = "printMessage")
+                     verbatimTextOutput(outputId = "printMessage"))
+              ),
+              fluidRow(
+              column(12,
+                     plotlyOutput(outputId = "control.types.per.ward"))
               )
-            )
+            
     )
   )
 )
