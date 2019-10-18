@@ -136,11 +136,11 @@ ui <- dashboardPage(
   skin = "black"
 )
 
-# Define server logic required to draw charts, datatables, and numeric based boxes
+# Define server logic required to draw 2 charts, datatable, and map
 server <- function(input, output) {
   
-  # Create subset of water features to account for user input. Specifically, make, council
-  # district, and features of the water dataset ------------------------------------------
+  # Create subset of water features to account for user input. Specifically, the make, council
+  # district, and features of the water dataset ----------------------------------------------
   waterSubset <- reactive({
     water.features <- subset(water.features,
                      Make %in% input$selected.make) %>%
@@ -150,10 +150,10 @@ server <- function(input, output) {
   
   # Perform updated API call, based on user's selected council district
   councilUpdate <- reactive({
-    # Build API Query with proper encodes
+    # Build API Query with proper encodes (provided by Insomnia)
     newUrl <- paste0("https://services1.arcgis.com/YZCmUqbcsUpOKfj7/ArcGIS/rest/services/Council_Districts/FeatureServer/0/query?where=Council%20=%20", input$selected.council, "&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=")
     
-    # change projection
+    # Change projection after doing new API call, based on user's selection of council district
     council <- readOGR(newUrl) 
     council <- council %>%
       spTransform(CRS('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'))
@@ -186,7 +186,6 @@ server <- function(input, output) {
   
   # Update the polygon layer, showing the selected council district. Remove old polygons
   observe({
-    print('me too')
     leafletProxy("water.leaflet", data = councilUpdate()) %>%
       clearGroup(group = "councilDistricts") %>%
       addPolygons(popup = ~paste0("<b>", COUNCIL, "</b>"), group = "councilDistricts", color = "red")
@@ -196,8 +195,9 @@ server <- function(input, output) {
   # Plot the number of water features in given neighborhoods
   output$barplot.neighborhoods <- renderPlotly({
     ws <- waterSubset()
+    # Ensure there is at least one row of data to plot ---------------------------
     req(nrow(ws) > 0)
-    # Find the 10 neighborhoods with the most water features to plot on barplot --------
+    # Find the 10 neighborhoods with the most water features to plot on barplot
     top.neighborhoods <- names(tail(sort(table(ws$Neighborhood)),10))
     ggplot(ws, aes(x = Neighborhood, fill = Status)) + geom_bar() +
       scale_x_discrete(limits = top.neighborhoods) + scale_fill_manual("Status:",
@@ -210,6 +210,7 @@ server <- function(input, output) {
   output$control.types.per.ward <- renderPlotly({
     # Read in the reactive subset ------------------------------------------------
     ws <- waterSubset()
+    # Ensure there is at least one row of data to plot ---------------------------
     req(nrow(ws) > 0)
     ggplot(ws, aes(x = Ward, y = `Control Type`)) +
       geom_point(col = "steelblue", size = 3, position = "jitter", alpha = 0.7) + 
