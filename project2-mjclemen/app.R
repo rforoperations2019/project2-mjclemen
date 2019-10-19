@@ -199,8 +199,7 @@ server <- function(input, output) {
   observe({
     leafletProxy("water.leaflet", data = councilUpdate()) %>%
       clearGroup(group = "councilDistricts") %>%
-      addPolygons(popup = ~paste0("<b>", COUNCIL, "</b>"), group = "councilDistricts", color = "red")
-      #setView(lat = council$INTPTLAT10[1], lng = council$INTPTLON10[1], zoom = 12)
+      addPolygons(popup = ~paste0("<b>", "Council District ", COUNCIL, "</b>"), group = "councilDistricts", color = "red")
   })
   
   # Plot the number of water features in given neighborhoods
@@ -241,14 +240,16 @@ server <- function(input, output) {
     }
   )
   
+  # Print a display message to the user if their selections result in zero data to plot
   output$printMessage <- renderText({
     req(nrow(waterSubset()) == 0)
-    "Unable to plot Neighborhoods: There is no data meeting your filter criteria. Please adjust filters"
+    "Unable to plot Neighborhoods: There is no data meeting your filter criteria. Please adjust filters."
   })
   
+  # Print a display message to the user if their selections result in zero data to plot
   output$printMessage2 <- renderText({
     req(nrow(waterSubset()) == 0)
-    "Unable to plot Control Types by Ward: There is no data meeting your filter criteria. Please adjust filters"
+    "Unable to plot Control Types by Ward: There is no data meeting your filter criteria. Please adjust filters."
   })
 }
 
