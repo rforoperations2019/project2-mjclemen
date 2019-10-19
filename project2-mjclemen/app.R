@@ -240,13 +240,13 @@ server <- function(input, output) {
     }
   )
   
-  # Print a display message to the user if their selections result in zero data to plot
+  # Print a display message to the user if their selections result in zero data to plot neighborhoods
   output$printMessage <- renderText({
     req(nrow(waterSubset()) == 0)
     "Unable to plot Neighborhoods: There is no data meeting your filter criteria. Please adjust filters."
   })
   
-  # Print a display message to the user if their selections result in zero data to plot
+  # Print a display message to the user if their selections result in zero data to plot countrol type by ward
   output$printMessage2 <- renderText({
     req(nrow(waterSubset()) == 0)
     "Unable to plot Control Types by Ward: There is no data meeting your filter criteria. Please adjust filters."
