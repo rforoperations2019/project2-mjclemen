@@ -115,7 +115,7 @@ app.body <- dashboardBody(
             fluidRow(
               column(12,
                      verbatimTextOutput(outputId = "printMessage")),
-              tags$head(tags$style("#printMessage{color: red; font-size: 15px; font-style: italic;}"))
+              tags$head(tags$style("#printMessage{color: red; font-size: 15px; font-style: italic; text-align: center;}"))
             ),
             fluidRow(
               column(12,
@@ -127,7 +127,7 @@ app.body <- dashboardBody(
             fluidRow(
               column(12,
                      verbatimTextOutput(outputId = "printMessage2"),
-                     tags$head(tags$style("#printMessage2{color: red; font-size: 15px; font-style: italic;}"))
+                     tags$head(tags$style("#printMessage2{color: red; font-size: 15px; font-style: italic; text-align: center;}"))
                      )
               ),
               fluidRow(
