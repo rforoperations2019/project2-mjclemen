@@ -113,7 +113,7 @@ app.body <- dashboardBody(
     ),
     tabItem(tabName = "neighborhood_count",
             fluidRow(
-              column(10,
+              column(12,
                      verbatimTextOutput(outputId = "printMessage")),
               tags$head(tags$style("#printMessage{color: red; font-size: 15px; font-style: italic;}"))
             ),
@@ -125,7 +125,7 @@ app.body <- dashboardBody(
     ),
     tabItem(tabName = "controls_by_ward",
             fluidRow(
-              column(11,
+              column(12,
                      verbatimTextOutput(outputId = "printMessage2"),
                      tags$head(tags$style("#printMessage2{color: red; font-size: 15px; font-style: italic;}"))
                      )
