@@ -84,9 +84,9 @@ app.sidebar <- dashboardSidebar(
                           choices = sort(unique(water.features$`Feature Type`)),
                           selected = c("Drinking Fountain")),
               
-              downloadButton("downloadWaterFeatures", "Download Filtered 'Water Features' Data", class = "butt"),
+              downloadButton("downloadWaterFeatures", "Download Filtered 'Water Features' Data", class = "download"),
               # Changing color of download button to better show up against background
-              tags$head(tags$style(".butt{color: black !important;}"))
+              tags$head(tags$style(".download{color: black !important;}"))
   )
 )
 
@@ -113,8 +113,9 @@ app.body <- dashboardBody(
     ),
     tabItem(tabName = "neighborhood_count",
             fluidRow(
-              column(12,
-                     verbatimTextOutput(outputId = "printMessage"))
+              column(10,
+                     verbatimTextOutput(outputId = "printMessage")),
+              tags$head(tags$style("#printMessage{color: red; font-size: 20px; font-style: italic;}"))
             ),
             fluidRow(
               column(12,
